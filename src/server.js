@@ -13,6 +13,14 @@ const songs = require('./api/songs');
 const SongsService = require('./services/postgres/SongsService');
 const SongsValidator = require('./validator/songs');
 
+// playlists
+const playlists = require('./api/playlists');
+const PlaylistsService = require('./services/postgres/PlaylistsService');
+const PlaylistValidator = require('./validator/playlists');
+
+// activities
+const ActivitiesService = require('./services/postgres/ActivitiesService');
+
 // users
 const users = require('./api/users');
 const UsersService = require('./services/postgres/UsersService');
@@ -24,6 +32,11 @@ const AuthenticationsService = require('./services/postgres/AuthenticationsServi
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
+// collaborations
+const collaborations = require('./api/collaborations');
+const CollaborationsService = require('./services/postgres/CollaborationsService');
+const CollaborationsValidator = require('./validator/collaborations');
+
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
@@ -31,6 +44,9 @@ const init = async () => {
     const songsService = new SongsService();
     const usersService = new UsersService();
     const authenticationsService = new AuthenticationsService();
+    const collaborationsService = new CollaborationsService();
+    const playlistsService = new PlaylistsService(collaborationsService);
+    const activitiesService = new ActivitiesService();
 
     const server = Hapi.server({
         port: process.env.PORT,
@@ -48,6 +64,23 @@ const init = async () => {
             plugin: Jwt,
         },
     ]);
+
+    // mendefinisikan strategy autentikasi jwt
+    server.auth.strategy('openmusic_jwt', 'jwt', {
+        keys: process.env.ACCESS_TOKEN_KEY,
+        verify: {
+            aud: false,
+            iss: false,
+            sub: false,
+            maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+        },
+        validate: (artifacts) => ({
+            isValid: true,
+            credentials: {
+                id: artifacts.decoded.payload.id,
+            },
+        }),
+    });
 
     await server.register([
         {
@@ -78,6 +111,25 @@ const init = async () => {
                 usersService,
                 tokenManager: TokenManager,
                 validator: AuthenticationsValidator,
+            },
+        },
+        {
+            plugin: playlists,
+            options: {
+                playlistsService,
+                songsService,
+                activitiesService,
+                tokenManager: TokenManager,
+                validator: PlaylistValidator,
+            },
+        },
+        {
+            plugin: collaborations,
+            options: {
+                collaborationsService,
+                usersService,
+                playlistsService,
+                validator: CollaborationsValidator,
             },
         },
     ]);

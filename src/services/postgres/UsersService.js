@@ -5,6 +5,9 @@ const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthenticationError = require('../../exceptions/AuthenticationError');
 
+/**
+ * UsersService is a class that will be used to handle the user data
+ */
 class UsersService {
     constructor() {
         this._pool = new Pool();
@@ -32,6 +35,21 @@ class UsersService {
     }
 
     /**
+     * verifyUser is a method that will be used to verify that the user exists
+     * in the database by its id
+     */
+    async verifyUser(id) {
+        const query = {
+            text: 'SELECT * FROM users WHERE id = $1',
+            values: [id],
+        };
+        const result = await this._pool.query(query);
+        if (!result.rows.length) {
+            throw new NotFoundError('User tidak ditemukan');
+        }
+    }
+
+    /**
      * verifyNewUsername is a method that will be used to
      * verify that the username is not used by another user
      */
@@ -52,10 +70,10 @@ class UsersService {
      * getUserById is a method that will be used to handle the GET request
      * to get a user by its id
      */
-    async getUserById(userId) {
+    async getUserById(id) {
         const query = {
             text: 'SELECT id, username, fullname FROM users WHERE id = $1',
-            values: [userId],
+            values: [id],
         };
 
         const result = await this._pool.query(query);
