@@ -21,7 +21,7 @@ class AlbumsService {
         const updatedAt = createdAt;
 
         const query = {
-            text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $5) RETURNING id',
+            text: 'INSERT INTO albums (id, name, year, created_at, updated_at) VALUES($1, $2, $3, $4, $5) RETURNING id',
             values: [id, name, year, createdAt, updatedAt],
         };
 
@@ -83,6 +83,24 @@ class AlbumsService {
 
         if (!result.rows.length) {
             throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
+        }
+    }
+
+    /**
+     * editAlbumCover is a method that will be used to handle the PUT request
+     * to edit a album cover by its id
+     */
+    async editAlbumCover(id, coverUrl) {
+        const updatedAt = new Date().toISOString();
+        const query = {
+            text: 'UPDATE albums SET cover_url = $1, updated_at = $2 WHERE id = $3 RETURNING id',
+            values: [coverUrl, updatedAt, id],
+        };
+
+        const result = await this._pool.query(query);
+
+        if (!result.rows.length) {
+            throw new NotFoundError('Gagal memperbarui cover album. Id tidak ditemukan');
         }
     }
 
