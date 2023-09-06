@@ -5,11 +5,11 @@
  * map the album data from database to the album model
  */
 // eslint-disable-next-line object-curly-newline
-const mapDBToAlbumModel = ({ id, name, year, cover_url, created_at, updated_at }) => ({
+const mapDBToAlbumModel = ({ id, name, year, cover, created_at, updated_at }) => ({
     id,
     name,
     year,
-    coverUrl: cover_url,
+    coverUrl: cover,
     createdAt: created_at,
     updatedAt: updated_at,
 });
