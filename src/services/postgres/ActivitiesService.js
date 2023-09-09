@@ -7,35 +7,35 @@ const InvariantError = require('../../exceptions/InvariantError');
  * related to playlist and song
  */
 class ActivitiesService {
-    constructor() {
-        this._pool = new Pool();
-    }
+	constructor() {
+		this._pool = new Pool();
+	}
 
-    /**
-     * addActivities is a function to add activities
-     */
-    async addActivities(playlistId, songId, userId, action) {
-        const id = `activity-${nanoid(16)}`;
-        const query = {
-            text: `INSERT INTO playlist_song_activities 
+	/**
+	 * addActivities is a function to add activities
+	 */
+	async addActivities(playlistId, songId, userId, action) {
+		const id = `activity-${nanoid(16)}`;
+		const query = {
+			text: `INSERT INTO playlist_song_activities 
         VALUES($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING id`,
-            values: [id, playlistId, songId, userId, action],
-        };
+			values: [id, playlistId, songId, userId, action],
+		};
 
-        const result = await this._pool.query(query);
-        if (!result.rowCount) {
-            throw new InvariantError('Aktivitas gagal ditambahkan');
-        }
+		const result = await this._pool.query(query);
+		if (!result.rowCount) {
+			throw new InvariantError('Aktivitas gagal ditambahkan');
+		}
 
-        return result.rows[0].id;
-    }
+		return result.rows[0].id;
+	}
 
-    /**
-     * getActivities is a function to get all activities
-     */
-    async getActivities(playlistId) {
-        const query = {
-            text: `SELECT users.username, songs.title,
+	/**
+	 * getActivities is a function to get all activities
+	 */
+	async getActivities(playlistId) {
+		const query = {
+			text: `SELECT users.username, songs.title,
       playlist_song_activities.action,
       playlist_song_activities.time
           FROM playlist_song_activities
@@ -46,12 +46,12 @@ class ActivitiesService {
           JOIN songs
           ON playlist_song_activities.song_id = songs.id
           WHERE playlists.id = $1`,
-            values: [playlistId],
-        };
+			values: [playlistId],
+		};
 
-        const result = await this._pool.query(query);
-        return result.rows;
-    }
+		const result = await this._pool.query(query);
+		return result.rows;
+	}
 }
 
 module.exports = ActivitiesService;

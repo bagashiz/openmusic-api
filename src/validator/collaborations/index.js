@@ -6,13 +6,13 @@ const { CollaborationPayloadSchema } = require('./schema');
  * that will be used to add a collaboration between a playlist and a user
  */
 const CollaborationsValidator = {
-    validateCollaborationPayload: (payload) => {
-        const validationResult = CollaborationPayloadSchema.validate(payload);
+	validateCollaborationPayload: (payload) => {
+		const validationResult = CollaborationPayloadSchema.validate(payload);
 
-        if (validationResult.error) {
-            throw new InvariantError(validationResult.error.message);
-        }
-    },
+		if (validationResult.error) {
+			throw new InvariantError(validationResult.error.message);
+		}
+	},
 };
 
 module.exports = CollaborationsValidator;

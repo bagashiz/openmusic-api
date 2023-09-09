@@ -6,13 +6,13 @@ const InvariantError = require('../../exceptions/InvariantError');
  * handle all of the export validators
  */
 const ExportsValidator = {
-    validateExportSongsPayload: (payload) => {
-        const validationResult = ExportSongsPayloadSchema.validate(payload);
+	validateExportSongsPayload: (payload) => {
+		const validationResult = ExportSongsPayloadSchema.validate(payload);
 
-        if (validationResult.error) {
-            throw new InvariantError(validationResult.error.message);
-        }
-    },
+		if (validationResult.error) {
+			throw new InvariantError(validationResult.error.message);
+		}
+	},
 };
 
 module.exports = ExportsValidator;

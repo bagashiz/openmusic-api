@@ -4,15 +4,14 @@
         "es2021": true,
         "node": true
     },
-    "extends": "airbnb-base",
-    "overrides": [],
+    "extends": ["eslint:recommended", "prettier"],
     "parserOptions": {
         "ecmaVersion": "latest"
     },
+    "plugins": [
+        "prettier"
+    ],
     "rules": {
-        "no-extranous-dependencies": 0,
-        "no-underscore-dangle": 0,
-        "indent": ["error", 4],
-        "no-console": 0
+        "prettier/prettier": "error"
     }
 }

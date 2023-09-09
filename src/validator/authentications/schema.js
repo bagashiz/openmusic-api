@@ -5,8 +5,8 @@ const Joi = require('joi');
  * validate the POST request payload
  */
 const PostAuthenticationPayloadSchema = Joi.object({
-    username: Joi.string().required(),
-    password: Joi.string().required(),
+	username: Joi.string().required(),
+	password: Joi.string().required(),
 });
 
 /**
@@ -14,7 +14,7 @@ const PostAuthenticationPayloadSchema = Joi.object({
  * validate the PUT request payload
  */
 const PutAuthenticationPayloadSchema = Joi.object({
-    refreshToken: Joi.string().required(),
+	refreshToken: Joi.string().required(),
 });
 
 /**
@@ -22,11 +22,11 @@ const PutAuthenticationPayloadSchema = Joi.object({
  * validate the DELETE request payload
  */
 const DeleteAuthenticationPayloadSchema = Joi.object({
-    refreshToken: Joi.string().required(),
+	refreshToken: Joi.string().required(),
 });
 
 module.exports = {
-    PostAuthenticationPayloadSchema,
-    PutAuthenticationPayloadSchema,
-    DeleteAuthenticationPayloadSchema,
+	PostAuthenticationPayloadSchema,
+	PutAuthenticationPayloadSchema,
+	DeleteAuthenticationPayloadSchema,
 };
