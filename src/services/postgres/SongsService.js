@@ -5,15 +5,33 @@ const { mapDBToSongModel } = require('../../utils');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
 /**
- * SongsService is a class that will be used to handle all of the CRUD operations on songs data
+ * SongsService is a class that will be used to handle all CRUD operations on songs data.
+ *
+ * @class
  */
 class SongsService {
+	/**
+	 * Creates an instance of SongsService.
+	 *
+	 * @constructor
+	 */
 	constructor() {
 		this._pool = new Pool();
 	}
 
 	/**
-	 * addSong is a method that will be used to handle the POST request to add a song
+	 * Adds a song to the database.
+	 *
+	 * @param {Object} songData - The song data to add.
+	 * @param {string} songData.title - The title of the song.
+	 * @param {number} songData.year - The year of the song.
+	 * @param {string} songData.genre - The genre of the song.
+	 * @param {string} songData.performer - The performer of the song.
+	 * @param {number} songData.duration - The duration of the song (optional).
+	 * @param {string} songData.albumId - The ID of the album associated with the song.
+	 * @returns {string} The ID of the added song.
+	 * @throws {InvariantError} If adding the song fails.
+	 * @async
 	 */
 	async addSong({ title, year, genre, performer, duration, albumId }) {
 		const id = nanoid(16);
@@ -35,7 +53,12 @@ class SongsService {
 	}
 
 	/**
-	 * getSongs is a method that will be used to handle the GET request to get all songs
+	 * Retrieves songs based on title and performer filters.
+	 *
+	 * @param {string} title - The title filter (optional).
+	 * @param {string} performer - The performer filter (optional).
+	 * @returns {Object[]} An array of song models that match the filters.
+	 * @async
 	 */
 	async getSongs(title, performer) {
 		let query = '';
@@ -63,8 +86,12 @@ class SongsService {
 	}
 
 	/**
-	 * getSongById is a method that will be used to handle the GET request
-	 * to get a song by its id
+	 * Retrieves a song by its ID.
+	 *
+	 * @param {string} id - The ID of the song.
+	 * @returns {Object} The song model.
+	 * @throws {NotFoundError} If the song is not found.
+	 * @async
 	 */
 	async getSongById(id) {
 		const query = {
@@ -81,8 +108,12 @@ class SongsService {
 	}
 
 	/**
-	 * editSongById is a method that will be used to handle the PUT request
-	 * to edit a song by its id
+	 * Edits a song by its ID.
+	 *
+	 * @param {string} id - The ID of the song to edit.
+	 * @param {Object} songData - The updated song data.
+	 * @throws {NotFoundError} If the song ID is not found.
+	 * @async
 	 */
 	async editSongById(id, { title, year, performer, genre, duration }) {
 		const updatedAt = new Date().toISOString();
@@ -99,8 +130,11 @@ class SongsService {
 	}
 
 	/**
-	 * deleteSongById is a method that will be used to handle the DELETE request
-	 * to delete a song by its id
+	 * Deletes a song by its ID.
+	 *
+	 * @param {string} id - The ID of the song to delete.
+	 * @throws {NotFoundError} If the song ID is not found.
+	 * @async
 	 */
 	async deleteSongById(id) {
 		const query = {
@@ -116,7 +150,11 @@ class SongsService {
 	}
 
 	/**
-	 * verifySong is a method that will be used to verify a song
+	 * Verifies the existence of a song by its ID.
+	 *
+	 * @param {string} id - The ID of the song to verify.
+	 * @throws {NotFoundError} If the song is not found.
+	 * @async
 	 */
 	async verifySong(id) {
 		const query = {

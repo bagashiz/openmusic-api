@@ -4,14 +4,27 @@ const InvariantError = require('../../exceptions/InvariantError');
 
 /**
  * CollaborationsService is a service that handles the collaboration between users
+ *
+ * @class
  */
 class CollaborationsService {
+	/**
+	 * Creates an instance of CollaborationsService.
+	 *
+	 * @constructor
+	 */
 	constructor() {
 		this._pool = new Pool();
 	}
 
 	/**
-	 * addCollaboration is a function to add collaboration between users
+	 * Adds a collaboration between users for a playlist.
+	 *
+	 * @param {string} playlistId - The ID of the playlist.
+	 * @param {string} userId - The ID of the user to collaborate with.
+	 * @returns {string} The ID of the added collaboration.
+	 * @throws {InvariantError} If adding the collaboration fails.
+	 * @async
 	 */
 	async addCollaboration(playlistId, userId) {
 		const id = `collaboration-${nanoid(16)}`;
@@ -28,7 +41,12 @@ class CollaborationsService {
 	}
 
 	/**
-	 * deleteCollaboration is a function to delete collaboration between users
+	 * Deletes a collaboration between a user and a playlist.
+	 *
+	 * @param {string} playlistId - The ID of the playlist.
+	 * @param {string} userId - The ID of the user to remove from the collaboration.
+	 * @throws {InvariantError} If deleting the collaboration fails.
+	 * @async
 	 */
 	async deleteCollaboration(playlistId, userId) {
 		const query = {
@@ -44,7 +62,12 @@ class CollaborationsService {
 	}
 
 	/**
-	 * verifyCollaborator is a function to verify if the user is a collaborator
+	 * Verifies if a user is a collaborator for a playlist.
+	 *
+	 * @param {string} playlistId - The ID of the playlist.
+	 * @param {string} userId - The ID of the user to verify as a collaborator.
+	 * @throws {InvariantError} If the user is not a collaborator for the playlist.
+	 * @async
 	 */
 	async verifyCollaborator(playlistId, userId) {
 		const query = {

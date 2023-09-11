@@ -1,10 +1,19 @@
 const autoBind = require('auto-bind');
 
 /**
- * ExportsHandler is a class that will be used to
- * handle all of the export routes
+ * ExportsHandler is a class that handles export routes.
+ *
+ * @class
  */
 class ExportsHandler {
+	/**
+	 * Creates an instance of ExportsHandler.
+	 *
+	 * @constructor
+	 * @param {ProducerService} producerService - The service for producing messages.
+	 * @param {PlaylistsService} playlistsService - The service for handling playlists.
+	 * @param {ExportsValidator} validator - The validator for exports.
+	 */
 	constructor(producerService, playlistsService, validator) {
 		this._producerService = producerService;
 		this._playlistsService = playlistsService;
@@ -13,6 +22,14 @@ class ExportsHandler {
 		autoBind(this);
 	}
 
+	/**
+	 * Handles the HTTP POST request to export songs from a playlist.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @param {ResponseToolkit} h - The Hapi.js response toolkit.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
+	 */
 	async postExportSongsHandler(request, h) {
 		this._validator.validateExportSongsPayload(request.payload);
 

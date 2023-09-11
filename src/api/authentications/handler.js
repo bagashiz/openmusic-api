@@ -1,10 +1,20 @@
 const autoBind = require('auto-bind');
 
 /**
- * AuthenticationsHandler is a class that will be used to
- * handle all of the HTTP requests that related to authentications.
+ * AuthenticationsHandler is a class that handles HTTP requests related to authentications.
+ *
+ * @class
  */
 class AuthenticationsHandler {
+	/**
+	 * Creates an instance of AuthenticationsHandler.
+	 *
+	 * @constructor
+	 * @param {AuthenticationsService} authenticationsService - The service for handling authentications.
+	 * @param {UsersService} usersService - The service for handling users.
+	 * @param {TokenManager} tokenManager - The token manager for generating and verifying tokens.
+	 * @param {UsersValidator} validator - The validator for users.
+	 */
 	constructor(authenticationsService, usersService, tokenManager, validator) {
 		this._authenticationsService = authenticationsService;
 		this._usersService = usersService;
@@ -15,9 +25,14 @@ class AuthenticationsHandler {
 	}
 
 	/**
-	 * postAuthenticationHandler is a function that will be used to
-	 * handle the HTTP POST request to create new authentication.
+	 * Handles the HTTP POST request to create a new authentication.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @param {ResponseToolkit} h - The Hapi.js response toolkit.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
 	 */
+
 	async postAuthenticationHandler(request, h) {
 		this._validator.validatePostAuthenticationPayload(request.payload);
 
@@ -42,8 +57,11 @@ class AuthenticationsHandler {
 	}
 
 	/**
-	 * putAuthenticationHandler is a function that will be used to
-	 * handle the HTTP PUT request to update authentication.
+	 * Handles the HTTP PUT request to update authentication.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
 	 */
 	async putAuthenticationHandler(request) {
 		this._validator.validatePutAuthenticationPayload(request.payload);
@@ -63,8 +81,11 @@ class AuthenticationsHandler {
 	}
 
 	/**
-	 *  deleteAuthenticationHandler is a function that will be used to
-	 * handle the HTTP DELETE request to delete authentication.
+	 * Handles the HTTP DELETE request to delete authentication.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
 	 */
 	async deleteAuthenticationHandler(request) {
 		this._validator.validateDeleteAuthenticationPayload(request.payload);

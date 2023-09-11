@@ -5,16 +5,30 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const ClientError = require('../../exceptions/ClientError');
 
 /**
- * UserAlbumLikesService is a service class that handles user album likes data
+ * UserAlbumLikesService is a service class that handles user album likes data.
+ *
+ * @class
  */
 class UserAlbumLikesService {
+	/**
+	 * Creates an instance of UserAlbumLikesService.
+	 *
+	 * @constructor
+	 * @param {CacheService} cacheService - The cache service to use for caching album likes.
+	 */
 	constructor(cacheService) {
 		this._pool = new Pool();
 		this._cacheService = cacheService;
 	}
 
 	/**
-	 * likeAlbum adds user and album id to user_album_likes table
+	 * Adds a user's like for an album to the database.
+	 *
+	 * @param {string} userId - The ID of the user liking the album.
+	 * @param {string} albumId - The ID of the album being liked.
+	 * @throws {ClientError} If the user has already liked the album.
+	 * @throws {InvariantError} If adding the like fails.
+	 * @async
 	 */
 	async likeAlbum(userId, albumId) {
 		const id = `user-album-like${nanoid(16)}`;
@@ -39,7 +53,13 @@ class UserAlbumLikesService {
 	}
 
 	/**
-	 * unlikeAlbum removes user and album id from user_album_likes table
+	 * Removes a user's like for an album from the database.
+	 *
+	 * @param {string} userId - The ID of the user unliking the album.
+	 * @param {string} albumId - The ID of the album being unliked.
+	 * @throws {ClientError} If the user has not previously liked the album.
+	 * @throws {NotFoundError} If removing the like fails.
+	 * @async
 	 */
 	async unlikeAlbum(userId, albumId) {
 		const alreadyLike = await this.verifyAlbumLike(userId, albumId);
@@ -62,7 +82,11 @@ class UserAlbumLikesService {
 	}
 
 	/**
-	 * getAlbumLikes returns sum of user likes for an album
+	 * Retrieves the total number of likes for an album.
+	 *
+	 * @param {string} albumId - The ID of the album.
+	 * @returns {Object} An object containing the number of likes and the source (cache or database).
+	 * @async
 	 */
 	async getAlbumLikes(albumId) {
 		try {
@@ -87,7 +111,12 @@ class UserAlbumLikesService {
 	}
 
 	/**
-	 * verifyAlbumLike checks if user has liked an album
+	 * Verifies if a user has liked a specific album.
+	 *
+	 * @param {string} userId - The ID of the user.
+	 * @param {string} albumId - The ID of the album.
+	 * @returns {boolean} `true` if the user has liked the album, `false` otherwise.
+	 * @async
 	 */
 	async verifyAlbumLike(userId, albumId) {
 		const query = {

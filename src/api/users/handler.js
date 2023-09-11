@@ -1,9 +1,18 @@
 const autoBind = require('auto-bind');
 
 /**
- * UsersHandler is a class that will be used to handle all of the routes
+ * UsersHandler is a class for handling user-related routes.
+ *
+ * @class
  */
 class UsersHandler {
+	/**
+	 * Creates an instance of UsersHandler.
+	 *
+	 * @constructor
+	 * @param {UsersService} service - The user service.
+	 * @param {UsersValidator} validator - The user data validator.
+	 */
 	constructor(service, validator) {
 		this._service = service;
 		this._validator = validator;
@@ -12,7 +21,12 @@ class UsersHandler {
 	}
 
 	/**
-	 * postUserHandler is a method that will be used to handle the POST request to add a user
+	 * Handles the POST request to add a user.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @param {ResponseToolkit} h - The Hapi.js response toolkit.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
 	 */
 	async postUserHandler(request, h) {
 		this._validator.validateUserPayload(request.payload);
@@ -32,8 +46,11 @@ class UsersHandler {
 	}
 
 	/**
-	 * getUserByIdHandler is a method that will be used to handle the GET request
-	 * to get a user by id
+	 * Handles the GET request to get a user by ID.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
 	 */
 	async getUserByIdHandler(request) {
 		const { id } = request.params;
@@ -49,8 +66,11 @@ class UsersHandler {
 	}
 
 	/**
-	 * getUsersByUsernameHandler is a method that will be used to handle the GET request
-	 * to get a user by username
+	 * Handles the GET request to get users by username.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
 	 */
 	async getUsersByUsernameHandler(request) {
 		const { username = '' } = request.query;

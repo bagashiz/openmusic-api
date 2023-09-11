@@ -1,9 +1,17 @@
 const ClientError = require('./ClientError');
 
 /**
- * InvariantError is a class that will be used to handle an error
+ * Represents an error indicating an invariant violation.
+ *
+ * @class
+ * @extends ClientError
  */
 class InvariantError extends ClientError {
+	/**
+	 * Creates an instance of InvariantError.
+	 *
+	 * @param {string} message - The error message.
+	 */
 	constructor(message) {
 		super(message);
 		this.name = 'InvariantError';

@@ -1,9 +1,18 @@
 const autoBind = require('auto-bind');
 
 /**
- * SongsHandler is a class that will be used to handle all of the routes
+ * SongsHandler is a class that will be used to handle all of the routes.
+ *
+ * @class
  */
 class SongsHandler {
+	/**
+	 * Creates an instance of SongsHandler.
+	 *
+	 * @constructor
+	 * @param {SongsService} service - The service for songs.
+	 * @param {SongsValidator} validator - The validator for songs.
+	 */
 	constructor(service, validator) {
 		this._service = service;
 		this._validator = validator;
@@ -12,7 +21,12 @@ class SongsHandler {
 	}
 
 	/**
-	 * postSongHandler is a method that will be used to handle the POST request to add a song
+	 * Handles the POST request to add a song.
+	 *
+	 * @param {request} request - the hapi.js request object.
+	 * @param {responsetoolkit} h - the hapi.js response toolkit.
+	 * @returns {responseobject} the http response.
+	 * @async
 	 */
 	async postSongHandler(request, h) {
 		this._validator.validateSongPayload(request.payload);
@@ -39,7 +53,11 @@ class SongsHandler {
 	}
 
 	/**
-	 * getSongsHandler is a method that will be used to handle the GET request to get all songs
+	 * Handles the GET request to get a song by ID.
+	 *
+	 * @param {request} request - the hapi.js request object.
+	 * @returns {responseobject} the http response.
+	 * @async
 	 */
 	async getSongsHandler(request) {
 		const { title, performer } = request.query;
@@ -58,8 +76,11 @@ class SongsHandler {
 	}
 
 	/**
-	 * getSongByIdHandler is a method that will be used to handle the GET request
-	 * to get a song by id
+	 * Handles the GET request to get a song by ID.
+	 *
+	 * @param {request} request - the hapi.js request object.
+	 * @returns {responseobject} the http response.
+	 * @async
 	 */
 	async getSongByIdHandler(request) {
 		const { id } = request.params;
@@ -73,8 +94,11 @@ class SongsHandler {
 	}
 
 	/**
-	 * putSongByIdHandler is a method that will be used to handle the PUT request
-	 * to edit a song by id
+	 * Handles the PUT request to edit a song by ID.
+	 *
+	 * @param {request} request - the hapi.js request object.
+	 * @returns {responseobject} the http response.
+	 * @async
 	 */
 	async putSongByIdHandler(request) {
 		this._validator.validateSongPayload(request.payload);
@@ -89,8 +113,11 @@ class SongsHandler {
 	}
 
 	/**
-	 * deleteSongByIdHandler is a method that will be used to handle the DELETE request
-	 * to delete a song by id
+	 * Handles the DELETE request to delete a song by ID.
+	 *
+	 * @param {request} request - the hapi.js request object.
+	 * @returns {responseobject} the http response.
+	 * @async
 	 */
 	async deleteSongByIdHandler(request) {
 		const { id } = request.params;

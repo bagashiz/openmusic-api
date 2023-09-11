@@ -3,14 +3,25 @@ const InvariantError = require('../../exceptions/InvariantError');
 
 /**
  * AuthenticationsService is a class that will be used to handle all of the authentication services
+ *
+ * @class
  */
 class AuthenticationsService {
+	/**
+	 * Creates an instance of AuthenticationsService.
+	 *
+	 * @constructor
+	 */
 	constructor() {
 		this._pool = new Pool();
 	}
 
 	/**
-	 * addRefreshToken is a method that will be used to add a refresh token to the database
+	 * Adds a refresh token to the database.
+	 *
+	 * @param {string} token - The refresh token to add.
+	 * @throws {InvariantError} If adding the refresh token fails.
+	 * @async
 	 */
 	async addRefreshToken(token) {
 		const query = {
@@ -22,7 +33,11 @@ class AuthenticationsService {
 	}
 
 	/**
-	 * verifyRefreshToken is a method that will be used to verify the refresh token
+	 * Verifies the validity of a refresh token.
+	 *
+	 * @param {string} token - The refresh token to verify.
+	 * @throws {InvariantError} If the refresh token is not valid.
+	 * @async
 	 */
 	async verifyRefreshToken(token) {
 		const query = {
@@ -37,7 +52,10 @@ class AuthenticationsService {
 	}
 
 	/**
-	 * deleteRefreshToken is a method that will be used to delete the refresh token
+	 * Deletes a refresh token from the database.
+	 *
+	 * @param {string} token - The refresh token to delete.
+	 * @async
 	 */
 	async deleteRefreshToken(token) {
 		const query = {

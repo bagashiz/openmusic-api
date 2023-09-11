@@ -59,6 +59,7 @@ const CacheService = require('./services/redis/CacheService');
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
+	// Create instances of various services
 	const albumsService = new AlbumsService();
 	const songsService = new SongsService();
 	const usersService = new UsersService();
@@ -70,6 +71,7 @@ const init = async () => {
 	const cacheService = new CacheService();
 	const userAlbumLikesService = new UserAlbumLikesService(cacheService);
 
+	// Create an instance of the Hapi server
 	const server = Hapi.server({
 		port: process.env.PORT,
 		host: process.env.HOST,
@@ -80,7 +82,7 @@ const init = async () => {
 		},
 	});
 
-	// register external plugin
+	// Register external plugins (Jwt and Inert)
 	await server.register([
 		{
 			plugin: Jwt,
@@ -90,7 +92,7 @@ const init = async () => {
 		},
 	]);
 
-	// define authentication strategy
+	// Define authentication strategy for JWT
 	server.auth.strategy('openmusic_jwt', 'jwt', {
 		keys: process.env.ACCESS_TOKEN_KEY,
 		verify: {
@@ -107,7 +109,7 @@ const init = async () => {
 		}),
 	});
 
-	// register internal plugin
+	// Register internal plugins (API routes)
 	await server.register([
 		{
 			plugin: albums,

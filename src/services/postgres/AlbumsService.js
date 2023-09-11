@@ -6,14 +6,28 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 
 /**
  * AlbumsService is a class that will be used to handle all of the CRUD operations on albums data
+ *
+ * @class
  */
 class AlbumsService {
+	/**
+	 * Creates an instance of AlbumsService.
+	 *
+	 * @constructor
+	 */
 	constructor() {
 		this._pool = new Pool();
 	}
 
 	/**
-	 * addAlbum is a method that will be used to handle the POST request to add a album
+	 * Adds an album to the database.
+	 *
+	 * @param {Object} albumData - The album data including name and year.
+	 * @param {string} albumData.name - The name of the album.
+	 * @param {number} albumData.year - The year of the album.
+	 * @returns {string} The ID of the added album.
+	 * @throws {InvariantError} If adding the album fails.
+	 * @async
 	 */
 	async addAlbum({ name, year }) {
 		const id = nanoid(16);
@@ -35,7 +49,10 @@ class AlbumsService {
 	}
 
 	/**
-	 * getAlbums is a method that will be used to handle the GET request to get all albums
+	 * Retrieves all albums from the database.
+	 *
+	 * @returns {Object[]} An array of album objects.
+	 * @async
 	 */
 	async getAlbums() {
 		const result = await this._pool.query('SELECT * FROM albums');
@@ -43,8 +60,12 @@ class AlbumsService {
 	}
 
 	/**
-	 * getAlbumById is a method that will be used to handle the GET request
-	 * to get a album by its id
+	 * Retrieves an album by its ID from the database.
+	 *
+	 * @param {string} id - The ID of the album to retrieve.
+	 * @returns {Object} The album object.
+	 * @throws {NotFoundError} If the album is not found.
+	 * @async
 	 */
 	async getAlbumById(id) {
 		const query = {
@@ -69,8 +90,14 @@ class AlbumsService {
 	}
 
 	/**
-	 * editAlbumById is a method that will be used to handle the PUT request
-	 * to edit a album by its id
+	 * Edits an album by its ID in the database.
+	 *
+	 * @param {string} id - The ID of the album to edit.
+	 * @param {Object} albumData - The album data to update.
+	 * @param {string} albumData.name - The updated name of the album.
+	 * @param {number} albumData.year - The updated year of the album.
+	 * @throws {NotFoundError} If the album is not found.
+	 * @async
 	 */
 	async editAlbumById(id, { name, year }) {
 		const updatedAt = new Date().toISOString();
@@ -87,8 +114,12 @@ class AlbumsService {
 	}
 
 	/**
-	 * editAlbumCover is a method that will be used to handle the PUT request
-	 * to edit a album cover by its id
+	 * Edits the cover of an album by its ID in the database.
+	 *
+	 * @param {string} id - The ID of the album to edit.
+	 * @param {string} coverUrl - The URL of the updated album cover.
+	 * @throws {NotFoundError} If the album is not found.
+	 * @async
 	 */
 	async editAlbumCover(id, coverUrl) {
 		const updatedAt = new Date().toISOString();
@@ -105,8 +136,11 @@ class AlbumsService {
 	}
 
 	/**
-	 * deleteAlbumById is a method that will be used to handle the DELETE request
-	 * to delete a album by its id
+	 * Deletes an album by its ID from the database.
+	 *
+	 * @param {string} id - The ID of the album to delete.
+	 * @throws {NotFoundError} If the album is not found.
+	 * @async
 	 */
 	async deleteAlbumById(id) {
 		const query = {

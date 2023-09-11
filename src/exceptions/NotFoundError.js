@@ -1,9 +1,17 @@
 const ClientError = require('./ClientError');
 
 /**
- * NotFoundError is a class that will be used to handle a 404 error
+ * Represents a 404 Not Found error.
+ *
+ * @class
+ * @extends ClientError
  */
 class NotFoundError extends ClientError {
+	/**
+	 * Creates an instance of NotFoundError.
+	 *
+	 * @param {string} message - The error message.
+	 */
 	constructor(message) {
 		super(message, 404);
 		this.name = 'NotFoundError';

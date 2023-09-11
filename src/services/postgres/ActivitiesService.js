@@ -3,16 +3,30 @@ const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
 
 /**
- * ActivitiesService is a service that handle all activities
- * related to playlist and song
+ * ActivitiesService is a service that handles activities related to playlists and songs.
+ *
+ * @class
  */
 class ActivitiesService {
+	/**
+	 * Creates an instance of ActivitiesService.
+	 *
+	 * @constructor
+	 */
 	constructor() {
 		this._pool = new Pool();
 	}
 
 	/**
-	 * addActivities is a function to add activities
+	 * Adds an activity related to a playlist and song to the database.
+	 *
+	 * @param {string} playlistId - The ID of the playlist.
+	 * @param {string} songId - The ID of the song.
+	 * @param {string} userId - The ID of the user performing the action.
+	 * @param {string} action - The type of action (e.g., 'add', 'delete').
+	 * @returns {string} The ID of the added activity.
+	 * @throws {InvariantError} If adding the activity fails.
+	 * @async
 	 */
 	async addActivities(playlistId, songId, userId, action) {
 		const id = `activity-${nanoid(16)}`;
@@ -31,7 +45,11 @@ class ActivitiesService {
 	}
 
 	/**
-	 * getActivities is a function to get all activities
+	 * Retrieves all activities related to a playlist from the database.
+	 *
+	 * @param {string} playlistId - The ID of the playlist.
+	 * @returns {Object[]} An array of activity objects.
+	 * @async
 	 */
 	async getActivities(playlistId) {
 		const query = {

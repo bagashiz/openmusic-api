@@ -1,10 +1,18 @@
 const autoBind = require('auto-bind');
 
 /**
- * UserAlbumLikesHandler is a class that will be used to handle all HTTP requests
- * related to user album likes.
+ * UserAlbumLikesHandler is a class that handles all HTTP requests related to user album likes.
+ *
+ * @class
  */
 class UserAlbumLikesHandler {
+	/**
+	 * Creates an instance of UserAlbumLikesHandler.
+	 *
+	 * @constructor
+	 * @param {UserAlbumLikesService} userAlbumLikesService - The service for user album likes.
+	 * @param {AlbumsService} albumsService - The service for albums.
+	 */
 	constructor(userAlbumLikesService, albumsService) {
 		this._userAlbumLikesService = userAlbumLikesService;
 		this._albumsService = albumsService;
@@ -13,7 +21,12 @@ class UserAlbumLikesHandler {
 	}
 
 	/**
-	 * postUserAlbumLikeHandler handles POST HTTP requests to like/unlike an album.
+	 * Handles POST HTTP requests to like/unlike an album.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @param {ResponseToolkit} h - The Hapi.js response toolkit.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
 	 */
 	async postUserAlbumLikeHandler(request, h) {
 		const { id: credentialId } = request.auth.credentials;
@@ -32,7 +45,12 @@ class UserAlbumLikesHandler {
 	}
 
 	/**
-	 * getUserAlbumLikeHandler handles GET HTTP requests to get sum of user likes for an album.
+	 * Handles GET HTTP requests to get the sum of user likes for an album.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @param {ResponseToolkit} h - The Hapi.js response toolkit.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
 	 */
 	async getUserAlbumLikeHandler(request, h) {
 		const { id } = request.params;
@@ -64,7 +82,12 @@ class UserAlbumLikesHandler {
 	}
 
 	/**
-	 * deleteUserAlbumLikeHandler handles DELETE HTTP requests to unlike an album.
+	 * Handles DELETE HTTP requests to unlike an album.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @param {ResponseToolkit} h - The Hapi.js response toolkit.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
 	 */
 	async deleteUserAlbumLikeHandler(request, h) {
 		const { id: credentialId } = request.auth.credentials;

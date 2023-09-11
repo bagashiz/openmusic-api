@@ -1,7 +1,10 @@
 const path = require('path');
 
 /**
- * routes handles the routes for the uploads API.
+ * Generates route configuration objects for upload-related endpoints.
+ *
+ * @param {Object} handler - The request handler object with specific methods.
+ * @returns {Object[]} An array of route configuration objects.
  */
 const routes = (handler) => [
 	{

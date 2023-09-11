@@ -1,9 +1,21 @@
 const autoBind = require('auto-bind');
 
 /**
- * PlaylistsHandler is a class that that will be used to handle all of the routes
+ * PlaylistsHandler is a class that handles playlist routes.
+ *
+ * @class
  */
 class PlaylistsHandler {
+	/**
+	 * Creates an instance of PlaylistsHandler.
+	 *
+	 * @constructor
+	 * @param {PlaylistsService} playlistsService - The service for handling playlists.
+	 * @param {SongsService} songsService - The service for handling songs.
+	 * @param {ActivitiesService} activitiesService - The service for handling activities.
+	 * @param {TokenManager} tokenManager - The token manager service.
+	 * @param {PlaylistsValidator} validator - The validator for playlists.
+	 */
 	constructor(playlistsService, songsService, activitiesService, tokenManager, validator) {
 		this._playlistsService = playlistsService;
 		this._activitiesService = activitiesService;
@@ -15,7 +27,12 @@ class PlaylistsHandler {
 	}
 
 	/**
-	 * postPlaylistHandler is a method that will be used to handle the post playlist route
+	 * Handles the HTTP POST request to create a new playlist.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @param {ResponseToolkit} h - The Hapi.js response toolkit.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
 	 */
 	async postPlaylistHandler(request, h) {
 		this._validator.validatePlaylistPayload(request.payload);
@@ -34,7 +51,11 @@ class PlaylistsHandler {
 	}
 
 	/**
-	 * getPlaylistHandler is a method that will be used to handle the get playlist route
+	 * Handles the HTTP GET request to retrieve playlists.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @returns {Object} The HTTP response.
+	 * @async
 	 */
 	async getPlaylistHandler(request) {
 		const { id: credentialId } = request.auth.credentials;
@@ -48,7 +69,11 @@ class PlaylistsHandler {
 	}
 
 	/**
-	 * deletePlaylistHandler is a method that will be used to handle the delete playlist route
+	 * Handles the HTTP DELETE request to delete a playlist.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @returns {Object} The HTTP response.
+	 * @async
 	 */
 	async deletePlaylistHandler(request) {
 		const { id: credentialId } = request.auth.credentials;
@@ -62,7 +87,12 @@ class PlaylistsHandler {
 	}
 
 	/**
-	 * postPlaylistSongHandler is a method that will be used to handle the post playlist song route
+	 * Handles the HTTP POST request to add a song to a playlist.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @param {ResponseToolkit} h - The Hapi.js response toolkit.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
 	 */
 	async postPlaylistSongHandler(request, h) {
 		this._validator.validatePlaylistSongPayload(request.payload);
@@ -87,7 +117,11 @@ class PlaylistsHandler {
 	}
 
 	/**
-	 * getPlaylistSongHandler is a method that will be used to handle the get playlist song route
+	 * Handles the HTTP GET request to retrieve songs from a playlist.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @returns {Object} The HTTP response.
+	 * @async
 	 */
 	async getPlaylistSongHandler(request) {
 		const { id: credentialId } = request.auth.credentials;
@@ -105,8 +139,11 @@ class PlaylistsHandler {
 	}
 
 	/**
-	 * deletePlaylistSongHandler is a method that will be used to handle
-	 * the delete playlist song route
+	 * Handles the HTTP DELETE request to remove a song from a playlist.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @returns {Object} The HTTP response.
+	 * @async
 	 */
 	async deletePlaylistSongHandler(request) {
 		const { id: credentialId } = request.auth.credentials;
@@ -124,8 +161,11 @@ class PlaylistsHandler {
 	}
 
 	/**
-	 * getPlaylistActivitiesHandler is a method that will be used to handle
-	 * the get playlist activities route
+	 * Handles the HTTP GET request to retrieve playlist activities.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @returns {Object} The HTTP response.
+	 * @async
 	 */
 	async getPlaylistActivitiesHandler(request) {
 		const { id: credentialId } = request.auth.credentials;
