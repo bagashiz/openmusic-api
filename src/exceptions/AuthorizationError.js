@@ -1,13 +1,21 @@
 const ClientError = require('./ClientError');
 
 /**
- * AuthorizationError is a class that will be used to handle authorization error
+ * Represents an error that occurs when authorization is denied.
+ *
+ * @class
+ * @extends ClientError
  */
 class AuthorizationError extends ClientError {
-    constructor(message) {
-        super(message, 403);
-        this.name = 'AuthorizationError';
-    }
+	/**
+	 * Creates an instance of AuthorizationError.
+	 *
+	 * @param {string} message - The error message.
+	 */
+	constructor(message) {
+		super(message, 403);
+		this.name = 'AuthorizationError';
+	}
 }
 
 module.exports = AuthorizationError;

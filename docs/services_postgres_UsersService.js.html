@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/postgres/UsersService.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/postgres/UsersService.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { nanoid } = require('nanoid');
+const { Pool } = require('pg');
+const bcrypt = require('bcrypt');
+const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
+const AuthenticationError = require('../../exceptions/AuthenticationError');
+
+/**
+ * UsersService is a class that provides methods for managing user data.
+ *
+ * @class
+ */
+class UsersService {
+	/**
+	 * Creates an instance of UsersService.
+	 *
+	 * @constructor
+	 */
+	constructor() {
+		this._pool = new Pool();
+	}
+
+	/**
+	 * Adds a new user to the database.
+	 *
+	 * @param {Object} userData - User data including username, password, and fullname.
+	 * @param {string} userData.username - The username of the user.
+	 * @param {string} userData.password - The password of the user.
+	 * @param {string} userData.fullname - The fullname of the user.
+	 * @returns {string} The ID of the newly added user.
+	 * @throws {InvariantError} If adding the user fails.
+	 * @async
+	 */
+	async addUser({ username, password, fullname }) {
+		await this.verifyNewUsername(username);
+
+		const id = `user-${nanoid(16)}`;
+		const hashedPassword = await bcrypt.hash(password, 10);
+		const query = {
+			text: 'INSERT INTO users VALUES($1, $2, $3, $4) RETURNING id',
+			values: [id, username, hashedPassword, fullname],
+		};
+
+		const result = await this._pool.query(query);
+
+		if (!result.rows.length) {
+			throw new InvariantError('User gagal ditambahkan');
+		}
+		return result.rows[0].id;
+	}
+
+	/**
+	 * Verifies the existence of a user by their ID.
+	 *
+	 * @param {string} id - The ID of the user to verify.
+	 * @throws {NotFoundError} If the user is not found.
+	 * @async
+	 */
+	async verifyUser(id) {
+		const query = {
+			text: 'SELECT * FROM users WHERE id = $1',
+			values: [id],
+		};
+		const result = await this._pool.query(query);
+		if (!result.rows.length) {
+			throw new NotFoundError('User tidak ditemukan');
+		}
+	}
+
+	/**
+	 * Verifies that a new username is not already in use by another user.
+	 *
+	 * @param {string} username - The username to verify.
+	 * @throws {InvariantError} If the username is already in use.
+	 * @async
+	 */
+	async verifyNewUsername(username) {
+		const query = {
+			text: 'SELECT username FROM users WHERE username = $1',
+			values: [username],
+		};
+
+		const result = await this._pool.query(query);
+
+		if (result.rows.length > 0) {
+			throw new InvariantError('Gagal menambahkan user. Username sudah digunakan.');
+		}
+	}
+
+	/**
+	 * Gets a user by their ID.
+	 *
+	 * @param {string} id - The ID of the user to retrieve.
+	 * @returns {Object} User information including ID, username, and fullname.
+	 * @throws {NotFoundError} If the user is not found.
+	 * @async
+	 */
+	async getUserById(id) {
+		const query = {
+			text: 'SELECT id, username, fullname FROM users WHERE id = $1',
+			values: [id],
+		};
+
+		const result = await this._pool.query(query);
+
+		if (!result.rows.length) {
+			throw new NotFoundError('User tidak ditemukan');
+		}
+
+		return result.rows[0];
+	}
+
+	/**
+	 * Verifies user credentials by checking the username and password.
+	 *
+	 * @param {string} username - The username to verify.
+	 * @param {string} password - The password to verify.
+	 * @returns {string} The ID of the authenticated user.
+	 * @throws {AuthenticationError} If the credentials are invalid.
+	 * @async
+	 */
+	async verifyUserCredential(username, password) {
+		const query = {
+			text: 'SELECT id, password FROM users WHERE username = $1',
+			values: [username],
+		};
+
+		const result = await this._pool.query(query);
+
+		if (!result.rows.length) {
+			throw new AuthenticationError('Kredensial yang Anda berikan salah');
+		}
+
+		const { id, password: hashedPassword } = result.rows[0];
+
+		const match = await bcrypt.compare(password, hashedPassword);
+
+		if (!match) {
+			throw new AuthenticationError('Kredensial yang Anda berikan salah');
+		}
+		return id;
+	}
+
+	/**
+	 * Gets users by their username, allowing partial matches.
+	 *
+	 * @param {string} username - The username to search for.
+	 * @returns {Object[]} An array of user information matching the username.
+	 * @async
+	 */
+	async getUsersByUsername(username) {
+		const query = {
+			text: 'SELECT id, username, fullname FROM users WHERE username LIKE $1',
+			values: [`%${username}%`],
+		};
+		const result = await this._pool.query(query);
+		return result.rows;
+	}
+}
+
+module.exports = UsersService;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="AlbumsValidator.html">AlbumsValidator</a></li><li><a href="AuthenticationsValidator.html">AuthenticationsValidator</a></li><li><a href="CollaborationsValidator.html">CollaborationsValidator</a></li><li><a href="ExportsValidator.html">ExportsValidator</a></li><li><a href="PlaylistValidator.html">PlaylistValidator</a></li><li><a href="ProducerService.html">ProducerService</a></li><li><a href="SongsValidator.html">SongsValidator</a></li><li><a href="TokenManager.html">TokenManager</a></li><li><a href="UploadsValidator.html">UploadsValidator</a></li><li><a href="UsersValidator.html">UsersValidator</a></li></ul><h3>Classes</h3><ul><li><a href="ActivitiesService.html">ActivitiesService</a></li><li><a href="AlbumsHandler.html">AlbumsHandler</a></li><li><a href="AlbumsService.html">AlbumsService</a></li><li><a href="AuthenticationError.html">AuthenticationError</a></li><li><a href="AuthenticationsHandler.html">AuthenticationsHandler</a></li><li><a href="AuthenticationsService.html">AuthenticationsService</a></li><li><a href="AuthorizationError.html">AuthorizationError</a></li><li><a href="CacheService.html">CacheService</a></li><li><a href="ClientError.html">ClientError</a></li><li><a href="CollaborationHandler.html">CollaborationHandler</a></li><li><a href="CollaborationsService.html">CollaborationsService</a></li><li><a href="ExportsHandler.html">ExportsHandler</a></li><li><a href="InvariantError.html">InvariantError</a></li><li><a href="NotFoundError.html">NotFoundError</a></li><li><a href="PlaylistsHandler.html">PlaylistsHandler</a></li><li><a href="PlaylistsService.html">PlaylistsService</a></li><li><a href="SongsHandler.html">SongsHandler</a></li><li><a href="SongsService.html">SongsService</a></li><li><a href="StorageService.html">StorageService</a></li><li><a href="UploadsHandler.html">UploadsHandler</a></li><li><a href="UserAlbumLikesHandler.html">UserAlbumLikesHandler</a></li><li><a href="UserAlbumLikesService.html">UserAlbumLikesService</a></li><li><a href="UsersHandler.html">UsersHandler</a></li><li><a href="UsersService.html">UsersService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#%2522content-type%2522">"content-type"</a></li><li><a href="global.html#AlbumPayloadSchema">AlbumPayloadSchema</a></li><li><a href="global.html#CollaborationPayloadSchema">CollaborationPayloadSchema</a></li><li><a href="global.html#DeleteAuthenticationPayloadSchema">DeleteAuthenticationPayloadSchema</a></li><li><a href="global.html#ExportSongsPayloadSchema">ExportSongsPayloadSchema</a></li><li><a href="global.html#ImageHeadersSchema">ImageHeadersSchema</a></li><li><a href="global.html#PlaylistPayloadSchema">PlaylistPayloadSchema</a></li><li><a href="global.html#PlaylistSongPayloadSchema">PlaylistSongPayloadSchema</a></li><li><a href="global.html#PostAuthenticationPayloadSchema">PostAuthenticationPayloadSchema</a></li><li><a href="global.html#PutAuthenticationPayloadSchema">PutAuthenticationPayloadSchema</a></li><li><a href="global.html#SongPayloadSchema">SongPayloadSchema</a></li><li><a href="global.html#UserPayloadSchema">UserPayloadSchema</a></li><li><a href="global.html#albumId">albumId</a></li><li><a href="global.html#duration">duration</a></li><li><a href="global.html#fullname">fullname</a></li><li><a href="global.html#genre">genre</a></li><li><a href="global.html#mapDBToAlbumModel">mapDBToAlbumModel</a></li><li><a href="global.html#mapDBToSongModel">mapDBToSongModel</a></li><li><a href="global.html#name">name</a></li><li><a href="global.html#password">password</a></li><li><a href="global.html#performer">performer</a></li><li><a href="global.html#playlistId">playlistId</a></li><li><a href="global.html#refreshToken">refreshToken</a></li><li><a href="global.html#routes">routes</a></li><li><a href="global.html#songId">songId</a></li><li><a href="global.html#targetEmail">targetEmail</a></li><li><a href="global.html#title">title</a></li><li><a href="global.html#userId">userId</a></li><li><a href="global.html#username">username</a></li><li><a href="global.html#year">year</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Sep 11 2023 18:12:47 GMT+0700 (Western Indonesia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

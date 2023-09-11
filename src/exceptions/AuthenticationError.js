@@ -1,13 +1,21 @@
 const ClientError = require('./ClientError');
 
 /**
- * AuthenticationError is a class that will be used to handle all of the authentication errors
+ * Represents an error that occurs during authentication.
+ *
+ * @class
+ * @extends ClientError
  */
 class AuthenticationError extends ClientError {
-    constructor(message) {
-        super(message, 401);
-        this.name = 'AuthenticationError';
-    }
+	/**
+	 * Creates an instance of AuthenticationError.
+	 *
+	 * @param {string} message - The error message.
+	 */
+	constructor(message) {
+		super(message, 401);
+		this.name = 'AuthenticationError';
+	}
 }
 
 module.exports = AuthenticationError;

@@ -1,30 +1,56 @@
 const fs = require('fs');
 
 /**
- * StorageService is a service that handles file uploads.
+ * StorageService is a class that provides methods for writing files to storage.
+ *
+ * @class
  */
 class StorageService {
-    constructor(folder) {
-        this._folder = folder;
+	/**
+	 * Creates a new instance of StorageService.
+	 *
+	 * @constructor
+	 * @param {string} folder - The folder path of the storage.
+	 */
+	constructor(folder) {
+		/**
+		 * The folder path of the storage.
+		 * @private
+		 * @type {string}
+		 */
+		this._folder = folder;
 
-        if (!fs.existsSync(folder)) {
-            fs.mkdirSync(folder, { recursive: true });
-        }
-    }
+		if (!fs.existsSync(folder)) {
+			fs.mkdirSync(folder, { recursive: true });
+		}
+	}
 
-    // writeFile is a function that writes a file to the storage.
-    writeFile(file, meta) {
-        const filename = +new Date() + meta.filename;
-        const path = `${this._folder}/${filename}`;
+	/**
+	 * Writes a file to the storage.
+	 *
+	 * @param {Readable} file - A readable stream containing the file data to be written.
+	 * @param {Object} meta - Metadata associated with the file.
+	 * @returns {Promise<string>} A promise that resolves to the filename of the stored file.
+	 * @throws {Error} Throws an error if there is an issue during the file write operation.
+	 */
+	async writeFile(file, meta) {
+		const filename = `${Date.now()}-${meta.filename}`;
+		const path = `${this._folder}/${filename}`;
 
-        const fileStream = fs.createWriteStream(path);
+		const fileStream = fs.createWriteStream(path);
 
-        return new Promise((resolve, reject) => {
-            fileStream.on('error', (error) => reject(error));
-            file.pipe(fileStream);
-            file.on('end', () => resolve(filename));
-        });
-    }
+		return new Promise((resolve, reject) => {
+			fileStream.on('error', (error) => {
+				reject(error);
+			});
+
+			file.pipe(fileStream);
+
+			file.on('end', () => {
+				resolve(filename);
+			});
+		});
+	}
 }
 
 module.exports = StorageService;

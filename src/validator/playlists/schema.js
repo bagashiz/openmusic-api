@@ -1,17 +1,33 @@
 const Joi = require('joi');
 
 /**
- * PlaylistPayloadSchema is a schema for validating playlist payload
+ * Schema for validating the playlist payload.
+ *
+ * @type {Joi.ObjectSchema}
  */
 const PlaylistPayloadSchema = Joi.object({
-    name: Joi.string().required(),
+	/**
+	 * The name of the playlist.
+	 *
+	 * @type {string}
+	 * @required
+	 */
+	name: Joi.string().required(),
 });
 
 /**
- * PlaylistSongPayloadSchema is a schema for validating playlist song payload
+ * Schema for validating the playlist song payload.
+ *
+ * @type {Joi.ObjectSchema}
  */
 const PlaylistSongPayloadSchema = Joi.object({
-    songId: Joi.string().required(),
+	/**
+	 * The ID of the song to be added to the playlist.
+	 *
+	 * @type {string}
+	 * @required
+	 */
+	songId: Joi.string().required(),
 });
 
 module.exports = { PlaylistPayloadSchema, PlaylistSongPayloadSchema };

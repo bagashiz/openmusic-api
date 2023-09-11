@@ -12,6 +12,9 @@ dist/
 bin/
 tmp/
 
+# exclude documentation directories
+docs/
+
 # exclude any version control files
 .git/
 

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/postgres/AlbumsService.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/postgres/AlbumsService.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { nanoid } = require('nanoid');
+const { Pool } = require('pg');
+const InvariantError = require('../../exceptions/InvariantError');
+const { mapDBToAlbumModel } = require('../../utils');
+const NotFoundError = require('../../exceptions/NotFoundError');
+
+/**
+ * AlbumsService is a class that will be used to handle all of the CRUD operations on albums data
+ *
+ * @class
+ */
+class AlbumsService {
+	/**
+	 * Creates an instance of AlbumsService.
+	 *
+	 * @constructor
+	 */
+	constructor() {
+		this._pool = new Pool();
+	}
+
+	/**
+	 * Adds an album to the database.
+	 *
+	 * @param {Object} albumData - The album data including name and year.
+	 * @param {string} albumData.name - The name of the album.
+	 * @param {number} albumData.year - The year of the album.
+	 * @returns {string} The ID of the added album.
+	 * @throws {InvariantError} If adding the album fails.
+	 * @async
+	 */
+	async addAlbum({ name, year }) {
+		const id = nanoid(16);
+		const createdAt = new Date().toISOString();
+		const updatedAt = createdAt;
+
+		const query = {
+			text: 'INSERT INTO albums (id, name, year, created_at, updated_at) VALUES($1, $2, $3, $4, $5) RETURNING id',
+			values: [id, name, year, createdAt, updatedAt],
+		};
+
+		const result = await this._pool.query(query);
+
+		if (!result.rows[0].id) {
+			throw new InvariantError('Album gagal ditambahkan');
+		}
+
+		return result.rows[0].id;
+	}
+
+	/**
+	 * Retrieves all albums from the database.
+	 *
+	 * @returns {Object[]} An array of album objects.
+	 * @async
+	 */
+	async getAlbums() {
+		const result = await this._pool.query('SELECT * FROM albums');
+		return result.rows.map(mapDBToAlbumModel);
+	}
+
+	/**
+	 * Retrieves an album by its ID from the database.
+	 *
+	 * @param {string} id - The ID of the album to retrieve.
+	 * @returns {Object} The album object.
+	 * @throws {NotFoundError} If the album is not found.
+	 * @async
+	 */
+	async getAlbumById(id) {
+		const query = {
+			text: 'SELECT * FROM albums WHERE id = $1',
+			values: [id],
+		};
+		const result = await this._pool.query(query);
+
+		if (!result.rows.length) {
+			throw new NotFoundError('Album tidak ditemukan');
+		}
+
+		const songs = await this._pool.query({
+			text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
+			values: [id],
+		});
+
+		return {
+			...result.rows.map(mapDBToAlbumModel)[0],
+			songs: songs.rows,
+		};
+	}
+
+	/**
+	 * Edits an album by its ID in the database.
+	 *
+	 * @param {string} id - The ID of the album to edit.
+	 * @param {Object} albumData - The album data to update.
+	 * @param {string} albumData.name - The updated name of the album.
+	 * @param {number} albumData.year - The updated year of the album.
+	 * @throws {NotFoundError} If the album is not found.
+	 * @async
+	 */
+	async editAlbumById(id, { name, year }) {
+		const updatedAt = new Date().toISOString();
+		const query = {
+			text: 'UPDATE albums SET name = $1, year = $2, updated_at = $3 WHERE id = $4 RETURNING id',
+			values: [name, year, updatedAt, id],
+		};
+
+		const result = await this._pool.query(query);
+
+		if (!result.rows.length) {
+			throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
+		}
+	}
+
+	/**
+	 * Edits the cover of an album by its ID in the database.
+	 *
+	 * @param {string} id - The ID of the album to edit.
+	 * @param {string} coverUrl - The URL of the updated album cover.
+	 * @throws {NotFoundError} If the album is not found.
+	 * @async
+	 */
+	async editAlbumCover(id, coverUrl) {
+		const updatedAt = new Date().toISOString();
+		const query = {
+			text: 'UPDATE albums SET cover_url = $1, updated_at = $2 WHERE id = $3 RETURNING id',
+			values: [coverUrl, updatedAt, id],
+		};
+
+		const result = await this._pool.query(query);
+
+		if (!result.rows.length) {
+			throw new NotFoundError('Gagal memperbarui cover album. Id tidak ditemukan');
+		}
+	}
+
+	/**
+	 * Deletes an album by its ID from the database.
+	 *
+	 * @param {string} id - The ID of the album to delete.
+	 * @throws {NotFoundError} If the album is not found.
+	 * @async
+	 */
+	async deleteAlbumById(id) {
+		const query = {
+			text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
+			values: [id],
+		};
+
+		const result = await this._pool.query(query);
+
+		if (!result.rows.length) {
+			throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
+		}
+	}
+}
+
+module.exports = AlbumsService;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="AlbumsValidator.html">AlbumsValidator</a></li><li><a href="AuthenticationsValidator.html">AuthenticationsValidator</a></li><li><a href="CollaborationsValidator.html">CollaborationsValidator</a></li><li><a href="ExportsValidator.html">ExportsValidator</a></li><li><a href="PlaylistValidator.html">PlaylistValidator</a></li><li><a href="ProducerService.html">ProducerService</a></li><li><a href="SongsValidator.html">SongsValidator</a></li><li><a href="TokenManager.html">TokenManager</a></li><li><a href="UploadsValidator.html">UploadsValidator</a></li><li><a href="UsersValidator.html">UsersValidator</a></li></ul><h3>Classes</h3><ul><li><a href="ActivitiesService.html">ActivitiesService</a></li><li><a href="AlbumsHandler.html">AlbumsHandler</a></li><li><a href="AlbumsService.html">AlbumsService</a></li><li><a href="AuthenticationError.html">AuthenticationError</a></li><li><a href="AuthenticationsHandler.html">AuthenticationsHandler</a></li><li><a href="AuthenticationsService.html">AuthenticationsService</a></li><li><a href="AuthorizationError.html">AuthorizationError</a></li><li><a href="CacheService.html">CacheService</a></li><li><a href="ClientError.html">ClientError</a></li><li><a href="CollaborationHandler.html">CollaborationHandler</a></li><li><a href="CollaborationsService.html">CollaborationsService</a></li><li><a href="ExportsHandler.html">ExportsHandler</a></li><li><a href="InvariantError.html">InvariantError</a></li><li><a href="NotFoundError.html">NotFoundError</a></li><li><a href="PlaylistsHandler.html">PlaylistsHandler</a></li><li><a href="PlaylistsService.html">PlaylistsService</a></li><li><a href="SongsHandler.html">SongsHandler</a></li><li><a href="SongsService.html">SongsService</a></li><li><a href="StorageService.html">StorageService</a></li><li><a href="UploadsHandler.html">UploadsHandler</a></li><li><a href="UserAlbumLikesHandler.html">UserAlbumLikesHandler</a></li><li><a href="UserAlbumLikesService.html">UserAlbumLikesService</a></li><li><a href="UsersHandler.html">UsersHandler</a></li><li><a href="UsersService.html">UsersService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#%2522content-type%2522">"content-type"</a></li><li><a href="global.html#AlbumPayloadSchema">AlbumPayloadSchema</a></li><li><a href="global.html#CollaborationPayloadSchema">CollaborationPayloadSchema</a></li><li><a href="global.html#DeleteAuthenticationPayloadSchema">DeleteAuthenticationPayloadSchema</a></li><li><a href="global.html#ExportSongsPayloadSchema">ExportSongsPayloadSchema</a></li><li><a href="global.html#ImageHeadersSchema">ImageHeadersSchema</a></li><li><a href="global.html#PlaylistPayloadSchema">PlaylistPayloadSchema</a></li><li><a href="global.html#PlaylistSongPayloadSchema">PlaylistSongPayloadSchema</a></li><li><a href="global.html#PostAuthenticationPayloadSchema">PostAuthenticationPayloadSchema</a></li><li><a href="global.html#PutAuthenticationPayloadSchema">PutAuthenticationPayloadSchema</a></li><li><a href="global.html#SongPayloadSchema">SongPayloadSchema</a></li><li><a href="global.html#UserPayloadSchema">UserPayloadSchema</a></li><li><a href="global.html#albumId">albumId</a></li><li><a href="global.html#duration">duration</a></li><li><a href="global.html#fullname">fullname</a></li><li><a href="global.html#genre">genre</a></li><li><a href="global.html#mapDBToAlbumModel">mapDBToAlbumModel</a></li><li><a href="global.html#mapDBToSongModel">mapDBToSongModel</a></li><li><a href="global.html#name">name</a></li><li><a href="global.html#password">password</a></li><li><a href="global.html#performer">performer</a></li><li><a href="global.html#playlistId">playlistId</a></li><li><a href="global.html#refreshToken">refreshToken</a></li><li><a href="global.html#routes">routes</a></li><li><a href="global.html#songId">songId</a></li><li><a href="global.html#targetEmail">targetEmail</a></li><li><a href="global.html#title">title</a></li><li><a href="global.html#userId">userId</a></li><li><a href="global.html#username">username</a></li><li><a href="global.html#year">year</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Sep 11 2023 18:12:47 GMT+0700 (Western Indonesia Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

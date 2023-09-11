@@ -1,83 +1,104 @@
 const autoBind = require('auto-bind');
 
 /**
- * AuthenticationsHandler is a class that will be used to
- * handle all of the HTTP requests that related to authentications.
+ * AuthenticationsHandler is a class that handles HTTP requests related to authentications.
+ *
+ * @class
  */
 class AuthenticationsHandler {
-    constructor(authenticationsService, usersService, tokenManager, validator) {
-        this._authenticationsService = authenticationsService;
-        this._usersService = usersService;
-        this._tokenManager = tokenManager;
-        this._validator = validator;
+	/**
+	 * Creates an instance of AuthenticationsHandler.
+	 *
+	 * @constructor
+	 * @param {AuthenticationsService} authenticationsService - The service for handling authentications.
+	 * @param {UsersService} usersService - The service for handling users.
+	 * @param {TokenManager} tokenManager - The token manager for generating and verifying tokens.
+	 * @param {UsersValidator} validator - The validator for users.
+	 */
+	constructor(authenticationsService, usersService, tokenManager, validator) {
+		this._authenticationsService = authenticationsService;
+		this._usersService = usersService;
+		this._tokenManager = tokenManager;
+		this._validator = validator;
 
-        autoBind(this);
-    }
+		autoBind(this);
+	}
 
-    /**
-     * postAuthenticationHandler is a function that will be used to
-     * handle the HTTP POST request to create new authentication.
-     */
-    async postAuthenticationHandler(request, h) {
-        this._validator.validatePostAuthenticationPayload(request.payload);
+	/**
+	 * Handles the HTTP POST request to create a new authentication.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @param {ResponseToolkit} h - The Hapi.js response toolkit.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
+	 */
 
-        const { username, password } = request.payload;
-        const id = await this._usersService.verifyUserCredential(username, password);
+	async postAuthenticationHandler(request, h) {
+		this._validator.validatePostAuthenticationPayload(request.payload);
 
-        const accessToken = this._tokenManager.generateAccessToken({ id });
-        const refreshToken = this._tokenManager.generateRefreshToken({ id });
+		const { username, password } = request.payload;
+		const id = await this._usersService.verifyUserCredential(username, password);
 
-        await this._authenticationsService.addRefreshToken(refreshToken);
+		const accessToken = this._tokenManager.generateAccessToken({ id });
+		const refreshToken = this._tokenManager.generateRefreshToken({ id });
 
-        const response = h.response({
-            status: 'success',
-            message: 'Authentication berhasil ditambahkan',
-            data: {
-                accessToken,
-                refreshToken,
-            },
-        });
-        response.code(201);
-        return response;
-    }
+		await this._authenticationsService.addRefreshToken(refreshToken);
 
-    /**
-     * putAuthenticationHandler is a function that will be used to
-     * handle the HTTP PUT request to update authentication.
-     */
-    async putAuthenticationHandler(request) {
-        this._validator.validatePutAuthenticationPayload(request.payload);
+		const response = h.response({
+			status: 'success',
+			message: 'Authentication berhasil ditambahkan',
+			data: {
+				accessToken,
+				refreshToken,
+			},
+		});
+		response.code(201);
+		return response;
+	}
 
-        const { refreshToken } = request.payload;
-        await this._authenticationsService.verifyRefreshToken(refreshToken);
-        const { id } = this._tokenManager.verifyRefreshToken(refreshToken);
+	/**
+	 * Handles the HTTP PUT request to update authentication.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
+	 */
+	async putAuthenticationHandler(request) {
+		this._validator.validatePutAuthenticationPayload(request.payload);
 
-        const accessToken = this._tokenManager.generateAccessToken({ id });
-        return {
-            status: 'success',
-            message: 'Access Token berhasil diperbarui',
-            data: {
-                accessToken,
-            },
-        };
-    }
+		const { refreshToken } = request.payload;
+		await this._authenticationsService.verifyRefreshToken(refreshToken);
+		const { id } = this._tokenManager.verifyRefreshToken(refreshToken);
 
-    /**
-     *  deleteAuthenticationHandler is a function that will be used to
-     * handle the HTTP DELETE request to delete authentication.
-     */
-    async deleteAuthenticationHandler(request) {
-        this._validator.validateDeleteAuthenticationPayload(request.payload);
+		const accessToken = this._tokenManager.generateAccessToken({ id });
+		return {
+			status: 'success',
+			message: 'Access Token berhasil diperbarui',
+			data: {
+				accessToken,
+			},
+		};
+	}
 
-        const { refreshToken } = request.payload;
-        await this._authenticationsService.verifyRefreshToken(refreshToken);
-        await this._authenticationsService.deleteRefreshToken(refreshToken);
+	/**
+	 * Handles the HTTP DELETE request to delete authentication.
+	 *
+	 * @param {Request} request - The Hapi.js request object.
+	 * @returns {ResponseObject} The HTTP response.
+	 * @async
+	 */
+	async deleteAuthenticationHandler(request) {
+		this._validator.validateDeleteAuthenticationPayload(request.payload);
 
-        return {
-            status: 'success',
-            message: 'Refresh token berhasil dihapus',
-        };
-    }
+		const { refreshToken } = request.payload;
+		await this._authenticationsService.verifyRefreshToken(refreshToken);
+		await this._authenticationsService.deleteRefreshToken(refreshToken);
+
+		return {
+			status: 'success',
+			message: 'Refresh token berhasil dihapus',
+		};
+	}
 }
 
 module.exports = AuthenticationsHandler;
