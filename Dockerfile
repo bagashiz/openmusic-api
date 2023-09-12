@@ -16,4 +16,5 @@ COPY . .
 # Expose port 5000
 EXPOSE 5000
 
-CMD npm run start-prod
+# Migrate database and start server
+CMD ["sh", "-c", "npm run migrate up && npm run start"]
